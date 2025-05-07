@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ping Sweep dengan Bash</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Scripting Bash: Ping Sweep</h1>
+    <p> <span style="color: red;">Disclaimer</span> Materi ini hanya untuk pembelajaran saja dan tidak untuk menciptakan kerusakan dimanapun...
+      <br>Pelajari cara mendeteksi host aktif di jaringan menggunakan bash script sederhana.
+    </p>
+  </header>
+
+  <main>
+    <!-- Pengertian Ping Sweep -->
+    <section>
+      <h2>📘 Apa itu Ping Sweep?</h2>
+      <p><a href="https://www.techtarget.com/searchnetworking/definition/ping-sweep-ICMP-sweep">Ping Sweep</a>
+         adalah teknik untuk mendeteksi host yang aktif dalam suatu jaringan dengan mengirimkan permintaan ping ke setiap alamat IP dalam rentang tertentu. Ini berguna untuk:
+        <li>Menemukan perangkat aktif di jaringan lokal.</li>
+        <li>Tahap awal dalam network reconnaissance atau scanning.</li>
+      </p>
+    </section>
+
+    <!-- TOOLS -->
+    <section>
+      <h2>⚙️ Tools</h2>
+      <p>Berikut adalah tools yang digunakan untuk melakukan Ping Sweep dengan Bash:</p>
+      <ul>
+        <li><strong>Terminal / Command Line (Linux Bash Shell)</strong> – untuk menjalankan perintah ping dan script bash.</li>
+        <li><strong>Text Editor</strong> – seperti <code>nano</code></li>
+        <li><strong>Perintah Bash Scripting</strong> – seperti <code>ping</code>, <code>ip a</code>,<code>cat</code>, <code>touch</code>, dan <code>nano</code> untuk membuat logika script.</li>
+        <li><strong>Perintah <code>chmod</code></strong> – digunakan untuk memberikan hak eksekusi pada file script.</li>
+      </ul>
+    </section>
+
+    <!-- Dasar Perintah -->
+    <section>
+      <h2>❗ Dasar Perintah Ping</h2>
+      <p>
+        Perintah dasar seperti 
+        <code>ping google.com</code>, 
+        <code>ping 8.8.8.8</code>, dan 
+        <code>ping 1.1.1.1</code> sering digunakan di Kali Linux untuk mengirim paket ICMP ke alamat target. 
+        Tujuannya adalah untuk mengecek apakah host tersebut aktif dan mengukur seberapa cepat responsnya (latency).
+      </p>
+    
+      <h4>📌 Penjelasan Masing-Masing:</h4>
+      <ol>
+        <li>
+          <code>ping google.com</code>
+          <p>
+            Mengirim ping ke domain Google. Ini menguji dua hal penting: <br>
+            - Apakah koneksi internet aktif <br>
+            - Apakah DNS (Domain Name System) berfungsi dengan baik
+          </p>
+        </li>
+    
+        <li>
+          <code>ping 8.8.8.8</code>
+          <p>
+          <img src="img/WhatsApp Image 2025-05-07 at 20.45.38_a9055554.jpg" alt="">
+          <br> Mengirim ping langsung ke DNS Google tanpa melalui DNS lookup. Cocok untuk menguji koneksi internet secara langsung .<br><br>
+            📊 Contoh hasil:<br>
+            - <strong>3 paket dikirim, 3 diterima</strong> → artinya tidak ada packet loss<br>
+            - <strong>time=22.2 ms</strong> → waktu respon dari server<br>
+            - <strong>ttl=111</strong> → jumlah hop tersisa<br>
+            - <strong>rtt min/avg/max/mdev</strong> → menunjukkan kualitas koneksi (semakin kecil semakin bagus)
+          </p>
+        </li>
+    
+        <li>
+          <code>ping 1.1.1.1</code>
+          <p>
+            Serupa dengan `8.8.8.8`, tapi targetnya adalah DNS milik Cloudflare. Biasanya lebih cepat dan banyak digunakan untuk testing koneksi internasional.
+          </p>
+        </li>
+      </ol>
+
+    </section>
+    
+<!-- Langkah Kerja -->
+    <section>
+      <h2>🛠️ Cara Menjalankan</h2>
+      <p>Kita langsung coba menjalankan script Ping Sweep dengan tools dan perintah yang sudah dijelaskan di atas. Berikut langkah-langkahnya:</p>
+    
+      <ol>
+        <li>
+          <strong>Buka terminal</strong> di Kali Linux atau distro Linux lainnya.
+        </li>
+        <li>
+          <strong>Masukan Bash :</strong> <code>sudo su</code>tujuannya berpindah dari user biasa ke user root pada sistem operasi Kali Linux
+        </li>
+        <li>
+          <strong>masukan bash</strong> <code>ping 1.1.1.1</code> kemudian kita akan mengambil satu baris IP saja masukan bash <code>ping -c 1 1.1.1.1</code>
+          kemudian kita akan memfilter lagi hanya menampilkan isi dari "bytes from" masukan lagi bash <code>ping -c 1 1.1.1. | grep "bytes from" | cut -d " " -f 4 | cut -d ":" -f 1 </code>
+           untuk menampilkan IP pada host yang aktif secara otomatis dalam script bash.
+        </li>
+        <li>
+          <strong>Buat file baru</strong> dengan nama <code>ping_sweep.sh</code> .Kita masukan bash <code>touch ping-sweep.sh</code> kemudian kita menggunakan text editor seperti 
+          <code>nano</code> lalu masukan ke dalam bash <code>nano ping_sweep.sh</code>
+        </li>
+        <li>
+          <strong>Tulis script berikut</strong> di dalam file tersebut:
+          <pre><code>#!/bin/bash
+ 
+            for ip in $(seq 1 254); do
+            ping -c 1 $1.$ip | grep "bytes from" | cut -d " " -f 4 | cut -d ":" -f 1 & 
+            done 
+          </code></pre>
+        </li>
+        <li>
+          <strong>Simpan dan keluar</strong> dari editor:<br>
+          Tekan <code>Ctrl + O</code>, lalu <code>Ctrl + X</code>, lalu <code>Enter</code>.
+        </li>
+        <li>
+          <strong>Berikan izin eksekusi</strong> ke file script:<br>
+          <code>chmod +x ping_sweep.sh</code>
+        </li>
+        <li>
+          <strong>Mencari IP yang aktif </strong> masukan bash <code>ip a</code> kita bisa ambil pada baris 2 yang ada tulisan inet 192.xxx.xx. 
+        </li>
+        <li>
+          <strong>Jalankan script</strong> dengan perintah:<br>
+          <code>./ping_sweep.sh 192.xxx.xx</code>
+        </li>
+        <li>
+          <strong>Lihat hasil</strong> di terminal — script akan mencetak IP mana yang aktif (up) atau tidak merespons (down).
+        </li>
+      </ol>
+
+      <h3>⚠️ Catatan Penting:</h3>
+      <p>
+        <ul>
+          <li>Mode root memungkinkan kamu untuk mengubah, menghapus, atau mengakses semua file sistem, jadi hati-hati saat menjalankan perintah.</li>
+          <li>Jika tidak hati-hati, kamu bisa merusak sistem operasi.</li>
+        </ul>
+      </p>
+    </section>
+    
+
+    <section>
+      <h2>⚠️ Tips dan Etika</h2>
+      <ul>
+        <li>Jangan digunakan di jaringan tanpa izin!</li>
+        <li>Beberapa firewall bisa memblokir ping, jadi hasil tidak selalu akurat.</li>
+        <li>Pahami tujuan penggunaan.</li>
+        <p>Tips ini akan membantumu tetap aman, etis, dan profesional saat menggunakan teknik ping sweep di dunia nyata maupun simulasi.</p>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Pembelajaran Bash Scripting | Dibuat oleh Arshie</p>
+  </footer>
+</body>
+</html>
